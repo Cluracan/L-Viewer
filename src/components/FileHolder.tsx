@@ -10,22 +10,22 @@ export const FileHolder = () => {
   };
 
   return (
-    <List>
-      {fileStore?.map((entry) => (
+    <List sx={{ width: "30vw", height: "30vh" }}>
+      {Object.entries(fileStore)?.map(([id, save]) => (
         <ListItem
-          key={entry.id}
+          key={id}
           secondaryAction={
             <IconButton
               aria-label="delete"
               onClick={() => {
-                handleClick(entry.id);
+                handleClick(id);
               }}
             >
               <DeleteIcon />
             </IconButton>
           }
         >
-          <ListItemText primary={entry.save.playerName} />
+          <ListItemText primary={save.playerName} />
         </ListItem>
       ))}
     </List>

@@ -25,18 +25,27 @@ export type DashboardSaveEntry = {
   save: DashboardSaveFile;
 };
 
-type State = { fileStore: DashboardSaveEntry[] | null };
+type State = { fileStore: Record<string, DashboardSaveFile> };
 
 type Action = {
-  updateFileStore: (files: State["fileStore"]) => void;
+  updateFiles: (files: DashboardSaveEntry[]) => void;
   deleteFile: (id: string) => void;
 };
 
 export const useFileStore = create<State & Action>((set) => ({
-  fileStore: null,
-  updateFileStore: (files) => set(() => ({ fileStore: files })),
+  fileStore: {},
+  updateFiles: (files) =>
+    set((state) => {
+      const next = { ...state.fileStore };
+      for (const { id, save } of files) {
+        next[id] = save;
+      }
+      return { fileStore: next };
+    }),
   deleteFile: (id) =>
-    set((state) => ({
-      fileStore: state.fileStore?.filter((entry) => entry.id !== id),
-    })),
+    set((state) => {
+      const next = { ...state.fileStore };
+      delete next[id];
+      return { fileStore: next };
+    }),
 }));

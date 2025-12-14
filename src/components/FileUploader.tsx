@@ -7,24 +7,16 @@ import {
 } from "../store/useFileStore";
 import { FileHolder } from "./FileHolder";
 
-// Helpers
-function createKeyGenerator() {
-  const counts = new Map();
-  return (key: string) => {
-    const newCount = (counts.get(key) ?? 0) + 1;
-    counts.set(key, newCount);
-    return `${key}-${newCount}`;
-  };
-}
-const keygen = createKeyGenerator(); //https://www.reddit.com/r/react/comments/13k2foo/what_to_use_as_key_prop_if_there_is_no_unique_key/
-
 export const FileUploader = () => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragAccept, setIsDragAccept] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
   const counter = useRef(0);
 
-  const updateFileStore = useFileStore((state) => state.updateFileStore);
+  const updateFiles = useFileStore((state) => state.updateFiles);
+  const filesLoaded = useFileStore(
+    (state) => Object.keys(state.fileStore).length > 0
+  );
 
   const clearDragState = () => {
     setIsDragActive(false);
@@ -48,14 +40,9 @@ export const FileUploader = () => {
         return validateSave(json);
       })
     );
-    const results: DashboardSaveEntry[] = rawResults
-      .filter((a) => a !== null)
-      .map((save) => ({
-        id: keygen(save.playerName),
-        save,
-      }));
+    const results: DashboardSaveEntry[] = rawResults.filter((a) => a !== null);
 
-    updateFileStore(results);
+    updateFiles(results);
   };
 
   const handleDragover = (e: DragEvent<HTMLDivElement>) => {
@@ -86,13 +73,17 @@ export const FileUploader = () => {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       sx={{
-        minWidth: 300,
-        minHeight: 300,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "40vw",
+        height: "50vh",
+        backgroundColor: "pink",
       }}
     >
       <Paper>
-        <Typography>Drag and drop files here</Typography>
-        <FileHolder />
+        {!filesLoaded && <Typography>Drag and drop files here</Typography>}
+        {filesLoaded && <FileHolder />}
 
         <Typography>Entered:{isDragActive ? "yes" : "no"}</Typography>
         <Typography>Rejected: {isDragReject ? "Yes" : "No"}</Typography>
@@ -142,7 +133,7 @@ function parseJson(text: string) {
   }
 }
 
-function validateSave(obj: unknown): DashboardSaveFile | null {
+function validateSave(obj: unknown): DashboardSaveEntry | null {
   if (!obj || typeof obj !== "object") {
     return null;
   }
@@ -152,12 +143,14 @@ function validateSave(obj: unknown): DashboardSaveFile | null {
     !hasOwnProperty(obj, "version") ||
     !isVersion(obj.version) ||
     obj.version.split(".")[0] !== MAJOR_VERSION ||
+    !hasOwnProperty(obj, "id") ||
+    typeof obj.id !== "string" ||
     !hasOwnProperty(obj, "gameData") ||
     obj.gameData === null
   ) {
     return null;
   }
-  return obj.gameData as DashboardSaveFile;
+  return { save: obj.gameData as DashboardSaveFile, id: obj.id };
 }
 
 const MAJOR_VERSION = "1";
