@@ -1,26 +1,20 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import { useRef, useState, type DragEvent } from "react";
 import {
   useFileStore,
   type DashboardSaveEntry,
   type DashboardSaveFile,
-} from "../store/useFileStore";
-import { FileHolder } from "./FileHolder";
+} from "../../store/useFileStore";
 
 export const FileUploader = () => {
   const [isDragActive, setIsDragActive] = useState(false);
-  const [isDragAccept, setIsDragAccept] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
   const counter = useRef(0);
 
   const updateFiles = useFileStore((state) => state.updateFiles);
-  const filesLoaded = useFileStore(
-    (state) => Object.keys(state.fileStore).length > 0
-  );
 
   const clearDragState = () => {
     setIsDragActive(false);
-    setIsDragAccept(false);
     setisDragReject(false);
     counter.current = 0;
   };
@@ -28,6 +22,7 @@ export const FileUploader = () => {
   const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (isDragReject) {
+      clearDragState();
       return;
     }
     clearDragState();
@@ -67,7 +62,7 @@ export const FileUploader = () => {
     }
   };
   return (
-    <Box
+    <Card
       onDrop={handleDrop}
       onDragOver={handleDragover}
       onDragEnter={handleDragEnter}
@@ -76,20 +71,17 @@ export const FileUploader = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        width: "40vw",
-        height: "50vh",
-        backgroundColor: "pink",
+        width: "30vw",
+        height: "30vh",
       }}
     >
-      <Paper>
-        {!filesLoaded && <Typography>Drag and drop files here</Typography>}
-        {filesLoaded && <FileHolder />}
+      <CardContent>
+        <Typography>Drag and drop files here</Typography>
 
         <Typography>Entered:{isDragActive ? "yes" : "no"}</Typography>
         <Typography>Rejected: {isDragReject ? "Yes" : "No"}</Typography>
-        <Typography>Accepted: {isDragAccept ? "Yes" : "No"}</Typography>
-      </Paper>
-    </Box>
+      </CardContent>
+    </Card>
   );
 };
 
