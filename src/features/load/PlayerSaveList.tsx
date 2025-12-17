@@ -12,11 +12,13 @@ import {
 import { useFileStore } from "../../store/useFileStore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-interface FileHolderProps {
-  onClick: () => void;
+interface PlayerSaveListProps {
+  onAddFiles: () => void;
 }
 
-export const FileHolder = ({ onClick }: FileHolderProps) => {
+export const PlayerSaveList = ({
+  onAddFiles: onClick,
+}: PlayerSaveListProps) => {
   const fileStore = useFileStore((state) => state.fileStore);
   const deleteFile = useFileStore((state) => state.deleteFile);
   console.log(fileStore);
