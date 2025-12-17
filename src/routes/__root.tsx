@@ -19,7 +19,7 @@ const drawerWidth = 240;
 
 const darkTheme = createTheme({
   typography: {
-    fontFamily: "Lucida Console",
+    // fontFamily: "Lucida Console",
   },
   palette: {
     mode: "dark",
