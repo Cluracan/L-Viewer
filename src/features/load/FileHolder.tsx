@@ -2,6 +2,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -10,7 +11,12 @@ import {
 } from "@mui/material";
 import { useFileStore } from "../../store/useFileStore";
 import DeleteIcon from "@mui/icons-material/Delete";
-export const FileHolder = () => {
+import AddIcon from "@mui/icons-material/Add";
+interface FileHolderProps {
+  onClick: () => void;
+}
+
+export const FileHolder = ({ onClick }: FileHolderProps) => {
   const fileStore = useFileStore((state) => state.fileStore);
   const deleteFile = useFileStore((state) => state.deleteFile);
   console.log(fileStore);
@@ -21,11 +27,16 @@ export const FileHolder = () => {
   return (
     <Card>
       <CardContent>
-        <CardHeader title="Player list" />
+        <CardHeader
+          title="Player list"
+          action={
+            <IconButton onClick={onClick}>
+              <AddIcon />
+            </IconButton>
+          }
+        />
+        <Divider />
         <List sx={{ width: "30vw", height: "30vh" }}>
-          {/* <ListItem>
-            <ListItemText primary="Players" />
-          </ListItem> */}
           {Object.entries(fileStore)?.map(([id, save]) => (
             <ListItem
               key={id}

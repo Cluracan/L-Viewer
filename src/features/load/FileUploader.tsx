@@ -6,7 +6,11 @@ import {
   type DashboardSaveFile,
 } from "../../store/useFileStore";
 
-export const FileUploader = () => {
+interface FileUploaderProps {
+  onClick: () => void;
+}
+
+export const FileUploader = ({ onClick }: FileUploaderProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
   const counter = useRef(0);
@@ -67,6 +71,7 @@ export const FileUploader = () => {
       onDragOver={handleDragover}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
+      onClick={onClick}
       sx={{
         display: "flex",
         justifyContent: "center",
@@ -77,7 +82,7 @@ export const FileUploader = () => {
     >
       <CardContent>
         <Typography>Drag and drop files here</Typography>
-
+        <Typography>Or Click to load</Typography>
         <Typography>Entered:{isDragActive ? "yes" : "no"}</Typography>
         <Typography>Rejected: {isDragReject ? "Yes" : "No"}</Typography>
       </CardContent>
