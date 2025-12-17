@@ -1,10 +1,10 @@
-import { FileUploader } from "../features/load/FileUploader";
+import { FileDropZone } from "../features/load/FileDropZone";
 
 export const Dashboard = () => {
   return (
     <>
       Dashboard
-      <FileUploader />
+      <FileDropZone />
     </>
   );
 };

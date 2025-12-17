@@ -32,7 +32,7 @@ type Action = {
   deleteFile: (id: string) => void;
 };
 
-export const useFileStore = create<State & Action>((set) => ({
+export const useSaveFileStore = create<State & Action>((set) => ({
   fileStore: {},
   updateFiles: (files) =>
     set((state) => {

@@ -1,7 +1,7 @@
 import type {
   DashboardSaveEntry,
   DashboardSaveFile,
-} from "../../store/useFileStore";
+} from "../../store/useSaveFileStore";
 
 // Constants
 const MAJOR_VERSION = "1";

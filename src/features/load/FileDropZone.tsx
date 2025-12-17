@@ -1,18 +1,20 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { useRef, useState, type DragEvent } from "react";
-import { useFileStore } from "../../store/useFileStore";
+import { useSaveFileStore } from "../../store/useSaveFileStore";
 import { extractSaveEntries } from "./extractSaveEntries";
 
-interface FileUploaderProps {
-  onAddFiles: () => void;
+interface FileDropZoneProps {
+  onOpenFilePicker: () => void;
 }
 
-export const FileUploader = ({ onAddFiles: onClick }: FileUploaderProps) => {
+export const FileDropZone = ({
+  onOpenFilePicker: onClick,
+}: FileDropZoneProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
   const counter = useRef(0);
 
-  const updateFiles = useFileStore((state) => state.updateFiles);
+  const updateFiles = useSaveFileStore((state) => state.updateFiles);
 
   const clearDragState = () => {
     setIsDragActive(false);

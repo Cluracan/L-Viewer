@@ -1,18 +1,18 @@
 import { Box } from "@mui/material";
-import { FileUploader } from "./FileUploader";
-import { useFileStore } from "../../store/useFileStore";
+import { FileDropZone } from "./FileDropZone";
+import { useSaveFileStore } from "../../store/useSaveFileStore";
 import { PlayerSaveList } from "./PlayerSaveList";
 import { useRef, type ChangeEvent } from "react";
 import { extractSaveEntries } from "./extractSaveEntries";
 
 export const LoadContent = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const filesLoaded = useFileStore(
+  const filesLoaded = useSaveFileStore(
     (state) => Object.keys(state.fileStore).length > 0
   );
-  const updateFiles = useFileStore((state) => state.updateFiles);
+  const updateFiles = useSaveFileStore((state) => state.updateFiles);
 
-  const handleAddFiles = () => {
+  const handleOpenFilePicker = () => {
     if (!inputRef.current) {
       return;
     }
@@ -47,9 +47,9 @@ export const LoadContent = () => {
         style={{ display: "none" }}
       />
       {filesLoaded ? (
-        <PlayerSaveList onAddFiles={handleAddFiles} />
+        <PlayerSaveList onOpenFilePicker={handleOpenFilePicker} />
       ) : (
-        <FileUploader onAddFiles={handleAddFiles} />
+        <FileDropZone onOpenFilePicker={handleOpenFilePicker} />
       )}
     </Box>
   );

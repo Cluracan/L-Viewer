@@ -9,18 +9,18 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { useFileStore } from "../../store/useFileStore";
+import { useSaveFileStore } from "../../store/useSaveFileStore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 interface PlayerSaveListProps {
-  onAddFiles: () => void;
+  onOpenFilePicker: () => void;
 }
 
 export const PlayerSaveList = ({
-  onAddFiles: onClick,
+  onOpenFilePicker: onClick,
 }: PlayerSaveListProps) => {
-  const fileStore = useFileStore((state) => state.fileStore);
-  const deleteFile = useFileStore((state) => state.deleteFile);
+  const fileStore = useSaveFileStore((state) => state.fileStore);
+  const deleteFile = useSaveFileStore((state) => state.deleteFile);
   console.log(fileStore);
   const handleClick = (id: string) => {
     deleteFile(id);
