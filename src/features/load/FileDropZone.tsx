@@ -2,6 +2,7 @@ import { Card, CardContent, Typography } from "@mui/material";
 import { useRef, useState, type DragEvent } from "react";
 import { useSaveFileStore } from "../../store/useSaveFileStore";
 import { extractSaveEntries } from "./extractSaveEntries";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 interface FileDropZoneProps {
   onOpenFilePicker: () => void;
@@ -12,6 +13,7 @@ export const FileDropZone = ({
 }: FileDropZoneProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
+  const borderColor = isDragReject ? "red" : isDragActive ? "white" : "gray";
   const counter = useRef(0);
 
   const updateFiles = useSaveFileStore((state) => state.updateFiles);
@@ -62,19 +64,22 @@ export const FileDropZone = ({
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onClick={onClick}
+      elevation={isDragActive ? 2 : 1}
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         width: "30vw",
         height: "30vh",
+        border: "1px dashed",
+        borderColor,
       }}
     >
-      <CardContent>
-        <Typography>Drag and drop files here</Typography>
-        <Typography>Or Click to load</Typography>
-        <Typography>Entered:{isDragActive ? "yes" : "no"}</Typography>
-        <Typography>Rejected: {isDragReject ? "Yes" : "No"}</Typography>
+      <CardContent sx={{ textAlign: "center" }}>
+        <FileUploadIcon fontSize="large" />
+        <Typography variant="h6">
+          Drag and drop files here or click to upload
+        </Typography>
       </CardContent>
     </Card>
   );
