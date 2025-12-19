@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useWindowDimensions } from "../../hooks/useWindowDimensions";
 import { Mapper } from "./Mapper";
-import { getRoomLocations } from "./getRoomLocations";
+import { getRoomLocations } from "./grid/getRoomLocations";
 
 const CANVAS_RATIO = 0.5;
 
