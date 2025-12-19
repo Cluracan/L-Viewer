@@ -2,16 +2,23 @@ import { roomData, type RoomId } from "../../assets/data/roomData";
 import { levelsConfig } from "./levelsConfig";
 
 //types
-type Location = { x: number; y: number };
+type GridPosition = { x: number; y: number };
 interface OffsetData {
   roomId: RoomId;
-  location: Location;
+  gridPosition: GridPosition;
   exits: Set<CompassDirection>;
 }
-type OffsetMap = Map<
+type RoomGridMap = Map<
   RoomId,
-  { location: Location; exits: Set<CompassDirection> }
+  { gridPosition: GridPosition; exits: Set<CompassDirection> }
 >;
+
+type GridBounds = {
+  height: number;
+  width: number;
+  grid: RoomGridMap;
+};
+
 //helper functions
 
 const nextRoomOffsets = {
@@ -33,75 +40,77 @@ const isCompassDirection = (
 };
 
 const getNextRoomOffset = (
-  { x, y }: Location,
+  { x, y }: GridPosition,
   direction: CompassDirection
-): Location => {
+): GridPosition => {
   const { dx, dy } = nextRoomOffsets[direction];
   return { x: x + dx, y: y + dy };
 };
 
-const getOffsetMap = (initialRoom: RoomId) => {
-  const offsetMap: OffsetMap = new Map();
+const buildRoomGrid = (initialRoom: RoomId) => {
+  const roomGridMap: RoomGridMap = new Map();
   const stack: OffsetData[] = [
-    { roomId: initialRoom, location: { x: 0, y: 0 }, exits: new Set() },
+    { roomId: initialRoom, gridPosition: { x: 0, y: 0 }, exits: new Set() },
   ];
   while (stack.length > 0) {
     const currentRoom = stack.pop();
     if (!currentRoom) {
       throw new Error("Unexpected empty stack in getRoomLocations");
     }
-    if (!offsetMap.has(currentRoom.roomId)) {
+    if (!roomGridMap.has(currentRoom.roomId)) {
       const exitData = roomData[currentRoom.roomId].exits;
       for (const [direction, nextRoomId] of Object.entries(exitData)) {
-        if (isCompassDirection(direction) && !offsetMap.has(nextRoomId)) {
+        if (isCompassDirection(direction) && !roomGridMap.has(nextRoomId)) {
           currentRoom.exits.add(direction);
           const nextRoomLocation = getNextRoomOffset(
-            currentRoom.location,
+            currentRoom.gridPosition,
             direction
           );
           stack.push({
             roomId: nextRoomId,
-            location: nextRoomLocation,
+            gridPosition: nextRoomLocation,
             exits: new Set(),
           });
         }
       }
-      offsetMap.set(currentRoom.roomId, {
-        location: currentRoom.location,
+      roomGridMap.set(currentRoom.roomId, {
+        gridPosition: currentRoom.gridPosition,
         exits: currentRoom.exits,
       });
     }
   }
-  return offsetMap;
+  return roomGridMap;
 };
 
-const translateOffsetMap = (offsetMap: OffsetMap) => {
+const normaliseGrid = (roomGridMap: RoomGridMap): GridBounds => {
   let [minX, maxX, minY, maxY] = [0, 0, 0, 0];
-  for (const { location } of offsetMap.values()) {
-    minX = Math.min(minX, location.x);
-    maxX = Math.max(maxX, location.x);
-    minY = Math.min(minY, location.y);
-    maxY = Math.max(maxY, location.y);
+  for (const { gridPosition } of roomGridMap.values()) {
+    minX = Math.min(minX, gridPosition.x);
+    maxX = Math.max(maxX, gridPosition.x);
+    minY = Math.min(minY, gridPosition.y);
+    maxY = Math.max(maxY, gridPosition.y);
   }
-  const dx = Math.abs(minX);
-  const dy = Math.abs(minY);
+  const shiftX = -minX;
+  const shiftY = -minY;
   const height = maxY - minY + 1;
   const width = maxX - minX + 1;
-  const translatedOffsetMap: OffsetMap = new Map();
-  for (const [roomId, { location, exits }] of offsetMap.entries()) {
-    translatedOffsetMap.set(roomId, {
-      location: { x: location.x + dx, y: location.y + dy },
+  const normalisedGrid: RoomGridMap = new Map();
+  for (const [
+    roomId,
+    { gridPosition: gridPosition, exits },
+  ] of roomGridMap.entries()) {
+    normalisedGrid.set(roomId, {
+      gridPosition: { x: gridPosition.x + shiftX, y: gridPosition.y + shiftY },
       exits,
     });
   }
-  return { height, width, translatedOffsetMap };
+  return { height, width, grid: normalisedGrid };
 };
 
 export const getRoomLocations = () => {
   return levelsConfig.map(({ level, initialRoom }) => {
-    const offsetMap = getOffsetMap(initialRoom);
-    const { height, width, translatedOffsetMap } =
-      translateOffsetMap(offsetMap);
-    return { level, offsetMap, translatedOffsetMap, height, width };
+    const roomGridMap = buildRoomGrid(initialRoom);
+    const { height, width, grid } = normaliseGrid(roomGridMap);
+    return { level, roomGridMap, grid, height, width };
   });
 };
