@@ -4,6 +4,7 @@ import {
   Box,
   createTheme,
   CssBaseline,
+  Divider,
   Drawer,
   List,
   ListItem,
@@ -77,6 +78,12 @@ const RootLayout = () => (
               <ListItem disablePadding>
                 <ListItemButton component={Link} to="/load">
                   Load
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton component={Link} to="/map">
+                  Map
                 </ListItemButton>
               </ListItem>
             </List>
