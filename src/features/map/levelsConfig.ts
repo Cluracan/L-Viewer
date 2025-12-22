@@ -1,4 +1,4 @@
-import type { RoomId } from "../../assets/data/roomData";
+import { roomData, type RoomId } from "../../assets/data/roomData";
 
 type LevelConfig = {
   level: string;
@@ -6,8 +6,8 @@ type LevelConfig = {
 };
 
 export const levelsConfig: LevelConfig[] = [
-  { level: "Ground floor", initialRoom: "hallway" },
-  { level: "First floor", initialRoom: "stairsSpiral" },
-  { level: "Cellars", initialRoom: "cellar00" },
-  { level: "Attic", initialRoom: "attic" },
+  { level: "Ground floor", initialRoom: roomData.hallway.id },
+  { level: "First floor", initialRoom: roomData.stairsSpiral.id },
+  { level: "Cellars", initialRoom: roomData.cellar00.id },
+  { level: "Attic", initialRoom: roomData.attic.id },
 ];

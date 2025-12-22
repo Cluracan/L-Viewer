@@ -20,3 +20,8 @@ export type NormalisedRoomGrid = {
   width: number;
   height: number;
 };
+
+export type NormalisedGridLevel = {
+  level: string;
+  normalised: NormalisedRoomGrid;
+};

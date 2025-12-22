@@ -1,38 +1,73 @@
-import { useEffect, useRef } from "react";
-import { useWindowDimensions } from "../../hooks/useWindowDimensions";
-import { Mapper } from "./Mapper";
-import { getRoomLocations } from "./grid/getRoomLocations";
+import { levelsConfig } from "./levelsConfig";
 
-const CANVAS_RATIO = 0.5;
+import {
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
+import CircleIcon from "@mui/icons-material/Circle";
+import { Canvas } from "./Canvas";
+import { useState } from "react";
+// import { useWindowDimensions } from "../../hooks/useWindowDimensions";
+import { getNormalisedRoomGrids } from "./grid/getNormalisedRoomGrids";
+
+import { useSaveFileStore } from "../../store/useSaveFileStore";
+import type { RoomId } from "../../assets/data/roomData";
+
+const uuidToColor = (uuid: string) => {
+  const hexDigits = uuid.replaceAll("-", "").slice(0, 6);
+  return `#${hexDigits}`;
+};
 
 export const MapContent = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const contextRef = useRef<CanvasRenderingContext2D>(null);
-  const mapperRef = useRef<Mapper | null>(null);
-  const { width, height } = useWindowDimensions();
-  const canvasWidth = CANVAS_RATIO * width;
-  const canvasHeight = CANVAS_RATIO * height;
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    contextRef.current = canvasRef.current.getContext("2d");
-    if (!contextRef.current) return;
-    mapperRef.current = new Mapper(
-      contextRef.current,
-      canvasWidth,
-      canvasHeight
-    );
-    getRoomLocations().forEach((item) => console.log(item));
-  }, [canvasWidth, canvasHeight]);
+  const [levelIndex, setLevelIndex] = useState(0);
 
+  // const { width, height } = useWindowDimensions();
+
+  const playerFiles = useSaveFileStore((state) => state.fileStore);
+  const mapLevels = getNormalisedRoomGrids();
+  const selectedPlayers = Object.entries(playerFiles).filter((e) =>
+    mapLevels[levelIndex].normalised.grid.has(e[1].currentRoom as RoomId)
+  );
+  const selectedPlayerMapData = selectedPlayers.map(([id, save]) => {
+    return {
+      color: uuidToColor(id),
+      playerName: save.playerName,
+      currentRoom: save.currentRoom,
+    };
+  });
+  const handleIncreaseLevel = () => {
+    setLevelIndex((levelIndex) => (levelIndex + 1) % levelsConfig.length);
+  };
+  const handleDecreaseLevel = () => {
+    setLevelIndex(
+      (levelIndex) =>
+        (levelIndex + levelsConfig.length - 1) % levelsConfig.length
+    );
+  };
   return (
     <>
-      <canvas
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
-        role="img"
-        aria-label="A map of the gameworld showing player locations."
-      />
+      <Canvas levelIndex={levelIndex} players={selectedPlayerMapData} />
+      <List
+        sx={{ height: "60vh", overflow: "auto" }}
+        subheader={<ListSubheader>{mapLevels[levelIndex].level}</ListSubheader>}
+      >
+        {selectedPlayers.map(([id, save]) => {
+          return (
+            <ListItem key={id}>
+              <ListItemIcon>
+                <CircleIcon sx={{ color: uuidToColor(id) }} />
+              </ListItemIcon>
+              <ListItemText primary={save.playerName} />
+            </ListItem>
+          );
+        })}
+      </List>
+      <Button onClick={handleIncreaseLevel}>+</Button>
+      <Button onClick={handleDecreaseLevel}>-</Button>
     </>
   );
 };

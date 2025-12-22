@@ -1,11 +1,12 @@
 import { levelsConfig } from "../levelsConfig";
 import { buildRoomGrid } from "./buildRoomGrid";
 import { normaliseGrid } from "./normaliseGrid";
+import type { NormalisedGridLevel } from "./types";
 
-export const getRoomLocations = () => {
+export const getNormalisedRoomGrids = (): NormalisedGridLevel[] => {
   return levelsConfig.map(({ level, initialRoom }) => {
     const raw = buildRoomGrid(initialRoom);
-    const { height, width, grid } = normaliseGrid(raw);
-    return { level, grid, height, width };
+    const normalised = normaliseGrid(raw);
+    return { level, normalised };
   });
 };
