@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { RoomId } from "../assets/data/roomData";
 
 // Types
 type EntryType = "input" | "description" | "action" | "warning";
@@ -12,11 +13,11 @@ type StoryLineEntry = {
 export type DashboardSaveFile = {
   playerName: string;
   bathState: Record<string, boolean>;
-  currentRoom: string;
+  currentRoom: RoomId;
   keyLocked: Record<string, boolean>;
   puzzleState: Record<string, Record<string, { puzzleCompleted: boolean }>>;
   stepCount: number;
-  visitedRooms: string[];
+  visitedRooms: RoomId[];
   storyLine: StoryLineEntry[];
 };
 
