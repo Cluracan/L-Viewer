@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoadRouteImport } from './routes/load'
+import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as IndexRouteImport } from './routes/index'
 
 const MapRoute = MapRouteImport.update({
@@ -23,6 +24,11 @@ const LoadRoute = LoadRouteImport.update({
   path: '/load',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeaderboardsRoute = LeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/load': typeof LoadRoute
   '/map': typeof MapRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/load': typeof LoadRoute
   '/map': typeof MapRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/load': typeof LoadRoute
   '/map': typeof MapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/load' | '/map'
+  fullPaths: '/' | '/leaderboards' | '/load' | '/map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/load' | '/map'
-  id: '__root__' | '/' | '/load' | '/map'
+  to: '/' | '/leaderboards' | '/load' | '/map'
+  id: '__root__' | '/' | '/leaderboards' | '/load' | '/map'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LeaderboardsRoute: typeof LeaderboardsRoute
   LoadRoute: typeof LoadRoute
   MapRoute: typeof MapRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaderboards': {
+      id: '/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/leaderboards'
+      preLoaderRoute: typeof LeaderboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LeaderboardsRoute: LeaderboardsRoute,
   LoadRoute: LoadRoute,
   MapRoute: MapRoute,
 }

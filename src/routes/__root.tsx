@@ -86,6 +86,11 @@ const RootLayout = () => (
                   Map
                 </ListItemButton>
               </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton component={Link} to="/leaderboards">
+                  Leaderboards
+                </ListItemButton>
+              </ListItem>
             </List>
           </Box>
         </Drawer>
