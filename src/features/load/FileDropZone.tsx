@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, useTheme } from "@mui/material";
 import { useRef, useState, type DragEvent } from "react";
 import { useSaveFileStore } from "../../store/useSaveFileStore";
 import { extractSaveEntries } from "./extractSaveEntries";
@@ -13,7 +13,12 @@ export const FileDropZone = ({
 }: FileDropZoneProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragReject, setisDragReject] = useState(false);
-  const borderColor = isDragReject ? "red" : isDragActive ? "white" : "gray";
+  const theme = useTheme();
+  const borderColor = isDragReject
+    ? theme.palette.error.main
+    : isDragActive
+      ? "white"
+      : "gray";
   const counter = useRef(0);
 
   const updateFiles = useSaveFileStore((state) => state.updateFiles);
