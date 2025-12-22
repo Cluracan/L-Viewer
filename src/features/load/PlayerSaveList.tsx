@@ -29,7 +29,7 @@ export const PlayerSaveList = ({
   const deleteFile = useSaveFileStore((state) => state.deleteFile);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const itemsSelcted = selected.size > 0;
+  const itemsSelected = selected.size > 0;
   const allPlayersSelected = selected.size === Object.keys(fileStore).length;
   const handleClick = (id: string) => {
     deleteFile(id);
@@ -63,39 +63,59 @@ export const PlayerSaveList = ({
   };
 
   return (
-    <Card>
-      <CardContent>
-        <CardHeader
-          title={
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Checkbox
-                edge="start"
-                disableRipple
-                onClick={handleSelectAll}
-                checked={allPlayersSelected}
-              />
-              <Typography variant="h5">Player List</Typography>
-              {itemsSelcted && (
-                <Tooltip
-                  title={allPlayersSelected ? "Remove All" : "Remove Selected"}
-                >
-                  <IconButton onClick={handleDeleteSelected} color="primary">
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Box>
-          }
-          action={
-            <Tooltip title="Add files">
-              <IconButton onClick={onClick} sx={{ mt: 1, mr: 1 }}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          }
-        />
-        <Divider />
-        <List sx={{ width: "30vw", height: "30vh", overflowY: "auto" }}>
+    <Card
+      sx={{
+        height: "clamp(30vh,40vh,80vh)",
+        width: "clamp(30vw, 40vw,50vw)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <CardHeader
+        title={
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 2, mx: 2, my: 1 }}
+          >
+            <Checkbox
+              edge="start"
+              disableRipple
+              onChange={handleSelectAll}
+              checked={allPlayersSelected}
+            />
+            <Typography variant="h5">Player List</Typography>
+            {itemsSelected && (
+              <Tooltip
+                title={allPlayersSelected ? "Remove All" : "Remove Selected"}
+              >
+                <IconButton onClick={handleDeleteSelected} color="primary">
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        }
+        action={
+          <Tooltip title="Add files">
+            <IconButton onClick={onClick} sx={{}}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        }
+        sx={{
+          "& .MuiCardHeader-action": {
+            alignSelf: "center",
+            mr: 2,
+          },
+        }}
+      />
+      <Divider />
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+        }}
+      >
+        <List>
           {Object.entries(fileStore)?.map(([id, save]) => {
             return (
               <ListItem
