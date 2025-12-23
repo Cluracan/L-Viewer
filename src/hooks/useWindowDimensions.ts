@@ -27,6 +27,6 @@ export const useWindowDimensions = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [debounced]);
   return dimensions;
 };
