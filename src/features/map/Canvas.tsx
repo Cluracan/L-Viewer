@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-// import { useWindowDimensions } from "../../hooks/useWindowDimensions";
+import { useEffect, useMemo, useRef } from "react";
+import { useWindowDimensions } from "../../hooks/useWindowDimensions";
 import { Mapper } from "./render/Mapper";
 import { getNormalisedRoomGrids } from "./grid/getNormalisedRoomGrids";
 import { buildDrawableRooms } from "./render/buildDrawableRooms";
@@ -14,10 +14,11 @@ export type PlayerMapData = {
 };
 type CanvasProps = { levelIndex: number; players: PlayerMapData[] };
 
-// const CANVAS_RATIO = 0.6;
-const ROOM_SIZE = 60;
-const CONNECTOR_LENGTH = 6;
+const CANVAS_RATIO = 0.6;
+const DEFAULT_ROOM_SIZE = 60;
+const DEFAULT_CONNECTOR_LENGTH = 6;
 const CANVAS_PADDING = 60;
+const ROOM_RADUIS = 3;
 
 export const Canvas = ({ levelIndex, players }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,18 +26,26 @@ export const Canvas = ({ levelIndex, players }: CanvasProps) => {
   const mapperRef = useRef<Mapper | null>(null);
 
   const drawableLevelsRef = useRef<DrawableRoomLevel[]>([]);
-  // const { width, height } = useWindowDimensions();
-  // const canvasWidth = CANVAS_RATIO * width;
-  // const canvasHeight = CANVAS_RATIO * height;
-  const normalisedLevels = getNormalisedRoomGrids();
+  const { width, height } = useWindowDimensions();
+  const maxCanvasWidth = CANVAS_RATIO * width;
+  const maxCanvasHeight = CANVAS_RATIO * height;
+  const normalisedLevels = useMemo(() => getNormalisedRoomGrids(), []);
 
-  const { canvasWidth, canvasHeight } = minimiseCanvas(
-    ROOM_SIZE,
-    CONNECTOR_LENGTH,
-    CANVAS_PADDING,
-    normalisedLevels
+  const { canvasWidth, canvasHeight, roomSize, connectorLength } = useMemo(
+    () =>
+      minimiseCanvas(
+        DEFAULT_ROOM_SIZE,
+        DEFAULT_CONNECTOR_LENGTH,
+        CANVAS_PADDING,
+        normalisedLevels,
+        maxCanvasWidth,
+        maxCanvasHeight
+      ),
+    [normalisedLevels, maxCanvasWidth, maxCanvasHeight]
   );
+
   useEffect(() => {
+    console.log({ roomSize });
     if (!canvasRef.current) return;
     contextRef.current = canvasRef.current.getContext("2d");
     if (!contextRef.current) return;
@@ -44,26 +53,33 @@ export const Canvas = ({ levelIndex, players }: CanvasProps) => {
     mapperRef.current = new Mapper(contextRef.current, {
       width: canvasWidth,
       height: canvasHeight,
-      roomSize: ROOM_SIZE,
-      connectorLength: CONNECTOR_LENGTH,
-      roomCornerRadius: 3,
+      roomSize: roomSize,
+      connectorLength: connectorLength,
+      roomCornerRadius: ROOM_RADUIS,
     });
 
     const drawableLevels = buildDrawableRooms(
       normalisedLevels,
       canvasWidth,
       canvasHeight,
-      ROOM_SIZE,
-      CONNECTOR_LENGTH
+      roomSize,
+      connectorLength
     );
     drawableLevelsRef.current = drawableLevels;
     mapperRef.current.renderMap(
       drawableLevels[0].rooms,
-      ROOM_SIZE,
-      CONNECTOR_LENGTH,
+      roomSize,
+      connectorLength,
       players
     );
-  }, [canvasWidth, canvasHeight, normalisedLevels, players]);
+  }, [
+    canvasWidth,
+    canvasHeight,
+    normalisedLevels,
+    players,
+    connectorLength,
+    roomSize,
+  ]);
 
   useEffect(() => {
     if (!mapperRef.current) return;
@@ -72,11 +88,11 @@ export const Canvas = ({ levelIndex, players }: CanvasProps) => {
     mapperRef.current.clearCanvas();
     mapperRef.current.renderMap(
       drawableLevelsRef.current[levelIndex].rooms,
-      ROOM_SIZE,
-      CONNECTOR_LENGTH,
+      roomSize,
+      connectorLength,
       players
     );
-  }, [levelIndex, players]);
+  }, [levelIndex, players, roomSize, connectorLength]);
   return (
     <>
       <canvas

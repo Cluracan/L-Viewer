@@ -1,21 +1,14 @@
 import { levelsConfig } from "./levelsConfig";
 
-import {
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-} from "@mui/material";
-import CircleIcon from "@mui/icons-material/Circle";
 import { Canvas } from "./Canvas";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 // import { useWindowDimensions } from "../../hooks/useWindowDimensions";
 import { getNormalisedRoomGrids } from "./grid/getNormalisedRoomGrids";
 
 import { useSaveFileStore } from "../../store/useSaveFileStore";
 import type { RoomId } from "../../assets/data/roomData";
+import { PlayerList } from "./playerList";
+import { Stack } from "@mui/material";
 
 const uuidToColor = (uuid: string) => {
   const hexDigits = uuid.replaceAll("-", "").slice(0, 6);
@@ -28,7 +21,7 @@ export const MapContent = () => {
   // const { width, height } = useWindowDimensions();
 
   const playerFiles = useSaveFileStore((state) => state.fileStore);
-  const mapLevels = getNormalisedRoomGrids();
+  const mapLevels = useMemo(() => getNormalisedRoomGrids(), []);
   const selectedPlayers = Object.entries(playerFiles).filter((e) =>
     mapLevels[levelIndex].normalised.grid.has(e[1].currentRoom as RoomId)
   );
@@ -49,25 +42,14 @@ export const MapContent = () => {
     );
   };
   return (
-    <>
+    <Stack direction={"row"} gap={2}>
       <Canvas levelIndex={levelIndex} players={selectedPlayerMapData} />
-      <List
-        sx={{ height: "60vh", overflow: "auto" }}
-        subheader={<ListSubheader>{mapLevels[levelIndex].level}</ListSubheader>}
-      >
-        {selectedPlayers.map(([id, save]) => {
-          return (
-            <ListItem key={id}>
-              <ListItemIcon>
-                <CircleIcon sx={{ color: uuidToColor(id) }} />
-              </ListItemIcon>
-              <ListItemText primary={save.playerName} />
-            </ListItem>
-          );
-        })}
-      </List>
-      <Button onClick={handleIncreaseLevel}>+</Button>
-      <Button onClick={handleDecreaseLevel}>-</Button>
-    </>
+      <PlayerList
+        selectedPlayers={selectedPlayers}
+        level={mapLevels[levelIndex].level}
+        handleIncreaseLevel={handleIncreaseLevel}
+        handleDecreaseLevel={handleDecreaseLevel}
+      />
+    </Stack>
   );
 };

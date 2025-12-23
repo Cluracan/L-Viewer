@@ -4,30 +4,76 @@ export const minimiseCanvas = (
   roomSize: number,
   connectorLength: number,
   padding: number,
-  normalisedLevels: NormalisedGridLevel[]
+  normalisedLevels: NormalisedGridLevel[],
+  maxWidth: number,
+  maxHeight: number
 ) => {
-  let minFitWidth = 0;
-  let minFitHeight = 0;
+  // Smallest canvas given fixed roomsize
+  let minViableWidth = 0;
+  let minViableHeight = 0;
   normalisedLevels.forEach((level) => {
     const xRoomCount = level.normalised.width;
     const yRoomCount = level.normalised.height;
-    minFitWidth = Math.max(
-      minFitWidth,
-      calculateMinLength(roomSize, connectorLength, xRoomCount, padding)
+    minViableWidth = Math.max(
+      minViableWidth,
+      calculateCanvasLength(roomSize, connectorLength, xRoomCount, padding)
     );
-    minFitHeight = Math.max(
-      minFitHeight,
-      calculateMinLength(roomSize, connectorLength, yRoomCount, padding)
+    minViableHeight = Math.max(
+      minViableHeight,
+      calculateCanvasLength(roomSize, connectorLength, yRoomCount, padding)
     );
   });
-  return { canvasWidth: minFitWidth, canvasHeight: minFitHeight };
+  if (minViableWidth < maxWidth && minViableHeight < maxHeight) {
+    return {
+      canvasWidth: minViableWidth,
+      canvasHeight: minViableHeight,
+      roomSize,
+      connectorLength,
+    };
+  } else {
+    // Largest roomsize given fixed width
+    let maxViableRoomSize = roomSize;
+    const connectorRatio = connectorLength / roomSize;
+    normalisedLevels.forEach((level) => {
+      const xRoomCount = level.normalised.width;
+      const yRoomCount = level.normalised.height;
+      maxViableRoomSize = Math.min(
+        maxViableRoomSize,
+        calculateRoomSize(maxWidth, xRoomCount, connectorRatio, padding)
+      );
+      maxViableRoomSize = Math.min(
+        maxViableRoomSize,
+        calculateRoomSize(maxHeight, yRoomCount, connectorRatio, padding)
+      );
+    });
+    maxViableRoomSize = Math.floor(maxViableRoomSize);
+    const maxViableConnectorLength = maxViableRoomSize * connectorRatio;
+    return {
+      canvasWidth: maxWidth,
+      canvasHeight: maxHeight,
+      roomSize: maxViableRoomSize,
+      connectorLength: maxViableConnectorLength,
+    };
+  }
 };
 
-const calculateMinLength = (
+const calculateCanvasLength = (
   roomSize: number,
   connectorLength: number,
   roomCount: number,
   padding: number
 ) => {
   return roomCount * roomSize + (roomCount - 1) * connectorLength + 2 * padding;
+};
+
+const calculateRoomSize = (
+  canvasLength: number,
+  roomCount: number,
+  connectorRatio: number,
+  padding: number
+) => {
+  return (
+    (canvasLength - 2 * padding) /
+    (roomCount + (roomCount - 1) * connectorRatio)
+  );
 };
