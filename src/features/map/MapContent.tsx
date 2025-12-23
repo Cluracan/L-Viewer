@@ -1,6 +1,6 @@
 import { levelsConfig } from "./levelsConfig";
 import { Canvas } from "./Canvas";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useWindowDimensions } from "../../hooks/useWindowDimensions";
 import { getNormalisedRoomGrids } from "./grid/getNormalisedRoomGrids";
 import { useSaveFileStore } from "../../store/useSaveFileStore";
@@ -56,15 +56,33 @@ export const MapContent = () => {
     [mapLevels, maxCanvasWidth, maxCanvasHeight]
   );
 
+  // Handlers
   const handleIncreaseLevel = () => {
     setLevelIndex((levelIndex) => (levelIndex + 1) % levelsConfig.length);
   };
+
   const handleDecreaseLevel = () => {
     setLevelIndex(
       (levelIndex) =>
         (levelIndex + levelsConfig.length - 1) % levelsConfig.length
     );
   };
+
+  // Effects
+  useEffect(() => {
+    const keyDownHandler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        handleDecreaseLevel();
+      } else if (e.key === "ArrowRight" || e.key === "PageDown") {
+        handleIncreaseLevel();
+      }
+    };
+
+    document.addEventListener("keydown", keyDownHandler);
+    return () => {
+      document.removeEventListener("keydown", keyDownHandler);
+    };
+  }, []);
 
   return (
     <Stack direction={"row"} gap={2}>
