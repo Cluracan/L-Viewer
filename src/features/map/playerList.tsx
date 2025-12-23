@@ -20,6 +20,7 @@ interface PlayerListProps {
   level: string;
   handleIncreaseLevel: () => void;
   handleDecreaseLevel: () => void;
+  height: number;
 }
 
 // Helpers
@@ -33,11 +34,13 @@ export const PlayerList = ({
   level,
   handleDecreaseLevel,
   handleIncreaseLevel,
+  height,
 }: PlayerListProps) => {
+  console.log(height);
   return (
     <Card>
       <CardContent
-        sx={{ display: "flex", flexDirection: "column", height: "50vh" }}
+        sx={{ display: "flex", flexDirection: "column", height: { height } }}
       >
         <CardHeader
           title={
