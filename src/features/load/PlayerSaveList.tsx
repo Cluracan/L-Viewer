@@ -30,7 +30,7 @@ export const PlayerSaveList = ({
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const itemsSelected = selected.size > 0;
-  const allPlayersSelected = selected.size === Object.keys(fileStore).length;
+  const allPlayersSelected = selected.size === fileStore.length;
   const handleClick = (id: string) => {
     deleteFile(id);
   };
@@ -46,11 +46,10 @@ export const PlayerSaveList = ({
   };
 
   const handleSelectAll = () => {
-    const allPlayers = Object.keys(fileStore);
     const nextSelected = new Set<string>();
-    if (selected.size < allPlayers.length) {
-      for (const id of Object.keys(fileStore)) {
-        nextSelected.add(id);
+    if (selected.size < fileStore.length) {
+      for (const file of fileStore) {
+        nextSelected.add(file.id);
       }
     }
     setSelected(nextSelected);
@@ -116,7 +115,7 @@ export const PlayerSaveList = ({
         }}
       >
         <List>
-          {Object.entries(fileStore)?.map(([id, save]) => {
+          {fileStore.map(({ id, save }) => {
             return (
               <ListItem
                 key={id}

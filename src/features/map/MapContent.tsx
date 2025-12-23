@@ -7,7 +7,6 @@ import { useSaveFileStore } from "../../store/useSaveFileStore";
 import { PlayerList } from "./playerList";
 import { Stack } from "@mui/material";
 import { minimiseCanvas } from "./render/minimiseCanvas";
-import type { RoomId } from "../../assets/data/roomData";
 
 // Helpers
 const uuidToColor = (uuid: string) => {
@@ -31,11 +30,11 @@ export const MapContent = () => {
   const maxCanvasHeight = CANVAS_RATIO * height;
 
   const mapLevels = useMemo(() => getNormalisedRoomGrids(), []);
-  const selectedPlayers = Object.entries(playerFiles).filter((e) =>
-    mapLevels[levelIndex].normalised.grid.has(e[1].currentRoom as RoomId)
+  const selectedPlayers = playerFiles.filter((file) =>
+    mapLevels[levelIndex].normalised.grid.has(file.save.currentRoom)
   );
 
-  const selectedPlayerMapData = selectedPlayers.map(([id, save]) => {
+  const selectedPlayerMapData = selectedPlayers.map(({ id, save }) => {
     return {
       color: uuidToColor(id),
       playerName: save.playerName,

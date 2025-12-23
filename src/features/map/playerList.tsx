@@ -10,13 +10,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import type { DashboardSaveFile } from "../../store/useSaveFileStore";
+import type { DashboardSaveEntry } from "../../store/useSaveFileStore";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import CircleIcon from "@mui/icons-material/Circle";
 
 interface PlayerListProps {
-  selectedPlayers: [string, DashboardSaveFile][];
+  selectedPlayers: DashboardSaveEntry[];
   level: string;
   handleIncreaseLevel: () => void;
   handleDecreaseLevel: () => void;
@@ -57,7 +57,7 @@ export const PlayerList = ({
         />
 
         <List sx={{ flexGrow: 1, overflowY: "auto" }}>
-          {selectedPlayers.map(([id, save]) => {
+          {selectedPlayers.map(({ id, save }) => {
             return (
               <ListItem key={id}>
                 <ListItemIcon>
